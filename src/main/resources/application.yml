@@ -1,6 +1,6 @@
 
 server:
- port: 8080
+ port: 8084
  
  error:
     include-binding-errors: always
@@ -12,7 +12,7 @@ server:
 
 spring:
  datasource:
-   url: jdbc:postgresql://localhost:5432/visionrent_db_day
+   url: jdbc:postgresql://localhost:5432/carRent
    username: mvc_user
    password: mvc_password
    driver-class-name: org.postgresql.Driver
