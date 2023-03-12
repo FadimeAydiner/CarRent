@@ -11,4 +11,5 @@ public interface ContactMessageRepository extends JpaRepository<ContactMessage,L
 
     //TODO please check triggers / indexes / views in SQL
 
+    //deneme
 }
