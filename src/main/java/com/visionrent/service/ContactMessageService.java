@@ -5,6 +5,8 @@ import com.visionrent.exception.ResourceNotFoundException;
 import com.visionrent.exception.message.ErrorMessage;
 import com.visionrent.repository.ContactMessageRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +28,8 @@ public class ContactMessageService {
         return contactMessageRepository.findAll();
     }
 
+    //Program to interface not to implementation
+    //https://medium.com/javarevisited/oop-good-practices-coding-to-the-interface-baea84fd60d3
     public ContactMessage getContactMessage(Long id){
         return contactMessageRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE,id)));
@@ -37,5 +41,18 @@ public class ContactMessageService {
         contactMessageRepository.delete(contactMessage);
     }
 
+    public void updateContactMessage(Long id,ContactMessage contactMessage){
+        ContactMessage foundContactMessage=getContactMessage(id);
+        foundContactMessage.setName(contactMessage.getName());
+        foundContactMessage.setSubject(contactMessage.getSubject());
+        foundContactMessage.setBody(contactMessage.getBody());
+        foundContactMessage.setEmail(contactMessage.getEmail());
+
+        contactMessageRepository.save(foundContactMessage);
+    }
+
+    public Page<ContactMessage> getAll(Pageable pageable){
+        return contactMessageRepository.findAll(pageable);
+    }
 
 }
