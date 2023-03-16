@@ -29,7 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ContactMessageController {
 
-    private ContactMessageMapper contactMessageMapper;
+
 
     private ContactMessageService contactMessageService;
     private final ContactMessageRepository contactMessageRepository;
@@ -40,8 +40,7 @@ public class ContactMessageController {
         /*
          * Design PROBLEM -> this kind of service layer implementations should be done in service layer.
          */
-        ContactMessage contactMessage = contactMessageMapper.contactMessageRequestToContactMessage(contactMessageRequest);
-        contactMessageService.saveMessage(contactMessage);
+       contactMessageService.saveMessage(contactMessageRequest);
         // as an example of HARD CODING
         //VRResponse response = new VRResponse("you made it",true);
         VRResponse response = new VRResponse(ResponseMessage.CONTACT_MESSAGE_SAVE_RESPONSE,true);
@@ -53,8 +52,7 @@ public class ContactMessageController {
     //TODO IMPORTANT -> admin endpoint
     @GetMapping
     public ResponseEntity<List<ContactMessageDTO>>getAllContactMessage(){
-        List<ContactMessage>contactMessageList = contactMessageService.getAll();
-        List<ContactMessageDTO>contactMessageDTOList = contactMessageMapper.map(contactMessageList);
+        List<ContactMessageDTO>contactMessageDTOList = contactMessageService.getAll();
         return ResponseEntity.ok(contactMessageDTOList);
         //bad implementation of code in context of readability.
         //return ResponseEntity.ok(contactMessageMapper.map(contactMessageService.getAll()));
@@ -72,8 +70,7 @@ public class ContactMessageController {
     //http://localhost:8084/contactmessage/request?id=6
     @GetMapping("/request")
     public ResponseEntity<ContactMessageDTO>  getRequestWithRequestParam(@RequestParam("id") Long id){
-        ContactMessage contactMessage=contactMessageService.getContactMessage(id);
-        ContactMessageDTO contactMessageDTO=contactMessageMapper.contactMessageToDTO(contactMessage);
+        ContactMessageDTO contactMessageDTO=contactMessageService.getContactMessage(id);
 
         return ResponseEntity.ok(contactMessageDTO);
 
@@ -82,8 +79,7 @@ public class ContactMessageController {
     //http://localhost:8084/contactmessage/6
     @GetMapping("{id}")
     public ResponseEntity<ContactMessageDTO> getRequestWithPath(@PathVariable Long id){
-        ContactMessage contactMessage=contactMessageService.getContactMessage(id);
-        ContactMessageDTO contactMessageDTO=contactMessageMapper.contactMessageToDTO(contactMessage);
+        ContactMessageDTO contactMessageDTO=contactMessageService.getContactMessage(id);
 
         return ResponseEntity.ok(contactMessageDTO);
 
@@ -92,9 +88,8 @@ public class ContactMessageController {
     @PutMapping("{id}")
     public ResponseEntity<VRResponse> updateContactMessage(@PathVariable Long id,@Valid @RequestBody ContactMessageRequest contactMessageRequest){
 
-        ContactMessage contactMessage=contactMessageMapper.contactMessageRequestToContactMessage(contactMessageRequest);
 
-        contactMessageService.updateContactMessage(id,contactMessage);
+        contactMessageService.updateContactMessage(id,contactMessageRequest);
         VRResponse response=new VRResponse(ResponseMessage.CONTACT_MESSAGE_UPDATE_RESPONSE,true);
         return ResponseEntity.ok(response);
 
@@ -112,8 +107,8 @@ public class ContactMessageController {
 
         Pageable pageable= PageRequest.of(page, size, Sort.by(direction,prop));
 
-        Page<ContactMessage> contactMessagePage=contactMessageService.getAll(pageable);
-        Page<ContactMessageDTO> contactMessageDTOS=getPageDTO(contactMessagePage);
+        Page<ContactMessageDTO> contactMessageDTOS=contactMessageService.getAll(pageable);
+
 
         return ResponseEntity.ok(contactMessageDTOS);
     }
@@ -122,8 +117,6 @@ public class ContactMessageController {
         this implementation should exist in Service Layer
         Controller Layer is not suitable for this implementation
      */
-    private Page<ContactMessageDTO> getPageDTO(Page<ContactMessage> contactMessagePage){
-        return contactMessagePage.map(contactMessage -> contactMessageMapper.contactMessageToDTO(contactMessage));
-    }
+
 
 }

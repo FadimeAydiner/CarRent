@@ -19,4 +19,7 @@ public interface ContactMessageMapper {
     ContactMessageDTO contactMessageToDTO(ContactMessage contactMessage);
     List<ContactMessageDTO>map(List<ContactMessage>contactMessageList);
 
+    ContactMessage contactMessageDTOtoContactMessage(ContactMessageDTO contactMessageDTO);
+    ContactMessageDTO contactMessageRequestToContactMessageDTO(ContactMessageRequest contactMessageRequest);
+
 }
