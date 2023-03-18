@@ -1,74 +1,74 @@
 
 server:
- port: 8084
- 
- error:
+  port: 8084
+
+  error:
     include-binding-errors: always
     include-message: always
     include-stacktrace: never
-    
- #servlet:
-  #context-path: /api/v0
+
+    #servlet:
+    #context-path: /api/v0
 
 spring:
- datasource:
-   url: jdbc:postgresql://localhost:5432/carRent
-   username: mvc_user
-   password: mvc_password
-   driver-class-name: org.postgresql.Driver
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carRent
+    username: mvc_user
+    password: mvc_password
+    driver-class-name: org.postgresql.Driver
 
-   
- #main:
-  #allow-circular-references: true
-    
- jpa:
-  hibernate:
-   ddl-auto: update    
-  show-sql: true
-  database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-  properties:
-   '[hibernate.format_sql]': true
- 
- servlet:
-  multipart:
-   max-file-size: 2MB
-   max-request-size: 2MB
-   
+
+      #main:
+      #allow-circular-references: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    properties:
+      '[hibernate.format_sql]': true
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
 logging:
- file:
-  name: logs/visionrent.log
- pattern: 
-  file: "%d %-5level [%thread] %logger:%msg%n"  
- level:
-  '[org.springframework.web]': WARN
-  '[org.hibernate]': INFO
-  '[com.visionrent]': DEBUG
-  
+  file:
+    name: logs/visionrent.log
+  pattern:
+    file: "%d %-5level [%thread] %logger:%msg%n"
+  level:
+    '[org.springframework.web]': WARN
+    '[org.hibernate]': INFO
+    '[com.visionrent]': DEBUG
+
 management:
- endpoints:
+  endpoints:
     web:
       exposure:
-        include: '*'  
-  
- info:
-  env:
-   enabled: true
- 
- endpoint:
-  health:
-   show-details: always
-   
-  shutdown:
-   enabled: true 
+        include: '*'
+
+  info:
+    env:
+      enabled: true
+
+  endpoint:
+    health:
+      show-details: always
+
+    shutdown:
+      enabled: true
 
 visionrent:
- app:
-  jwtSecret: visionRent@!23
-  jwtExpirationMs: 86400000
-  
+  app:
+    jwtSecret: visionRent@!23
+    jwtExpirationMs: 86400000
+
 info:
- application:
-  name: 'VisionRent Backend App'  
-  description: 'This is VisionRent Carrental Backend Project'
-  version: '@project.version@' 
+  application:
+    name: 'VisionRent Backend App'
+    description: 'This is VisionRent Carrental Backend Project'
+    version: '@project.version@'
      

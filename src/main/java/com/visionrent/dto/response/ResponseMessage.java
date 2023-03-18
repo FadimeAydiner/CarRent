@@ -9,4 +9,10 @@ public class ResponseMessage {
     public static final String CONTACT_MESSAGE_DELETE_RESPONSE = "ContactMessage Successfully Deleted";
      public static final String CONTACT_MESSAGE_UPDATE_RESPONSE = "ContactMessage Successfully Updated";
 
+
+     //User message related with response messages
+     public static final String REGISTER_RESPONSE_MESSAGE="Registration Successfully Done";
+
+     public static final String USER_DELETE_RESPONSE_MESSAGE="User Successfully Deleted";
+
 }
