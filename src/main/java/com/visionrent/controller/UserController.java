@@ -75,5 +75,9 @@ public class UserController {
     }
 
 
-
+    @PutMapping("/auth/builtIn")
+    public ResponseEntity<UserDTO> updateBuiltIn(@RequestParam("id") Long id,@RequestParam("builtIn") boolean builtIn){
+        UserDTO userDTO=userService.updateBuiltInProperty(id,builtIn);
+        return ResponseEntity.ok(userDTO);
+    }
 }

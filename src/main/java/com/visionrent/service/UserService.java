@@ -91,8 +91,9 @@ public class UserService {
         return userDTO;
     }
 
-    /*
-         From security context we are fetching current user information
+    /**
+     * From security context we are fetching current user information
+     * @return
      */
     public User getCurrentUser(){
 
@@ -116,14 +117,30 @@ public class UserService {
     // add an algorithm if the user that wanted to be deleted must not be logged in user
     public void removeUserById(Long id)  {
         User user=getById(id);
-        //TODO your own your repo you can this function and add more end points
-        // to change the built in property in db
+        //TODO your own repo you can change this function and add more endpoints
+        // to change the built in property in DB
         // but check the entity class for default value
+
+        //Current user
+        if(user==getCurrentUser()){
+            throw new BadRequestException(ErrorMessage.CURRENT_USER_NOT_DELETE_MESSAGE);
+        }
 
        //we are checking if we are allowed to delete this user
         if(user.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
         userRepository.deleteById(user.getId());
+    }
+
+    public UserDTO updateBuiltInProperty(Long id,boolean builtIn){
+        User user=getById(id);
+
+        if(user.getBuiltIn()!=builtIn){
+            user.setBuiltIn(builtIn);
+        }
+        userRepository.save(user);
+        UserDTO userDTO=userMapper.userToUserDTO(user);
+        return userDTO;
     }
 }

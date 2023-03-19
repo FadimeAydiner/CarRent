@@ -65,7 +65,6 @@ visionrent:
   app:
     jwtSecret: visionRent@!23
     jwtExpirationMs: 86400000
-
 info:
   application:
     name: 'VisionRent Backend App'

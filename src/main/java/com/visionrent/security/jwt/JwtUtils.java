@@ -22,18 +22,18 @@ import java.util.Date;
 public class JwtUtils {
     private static final Logger LOGGER=LoggerFactory.getLogger(JwtUtils.class);
 
-    //@Value("${visionrent.app.jwtExpirationMs}")
-    public long jwtExprations=86400000;
+    @Value("${visionrent.app.jwtExpirationMs}")
+    public long jwtExpirations;
 
-   //@Value("${visionrent.app.jwtSecret}")
-    public String jwtSecret="visionRent@!23";
+    @Value("${visionrent.app.jwtSecret}")
+    public String jwtSecret;
 
     public String generateToken(UserDetails userDetails){
         return Jwts.builder().setSubject(userDetails.getUsername())
                 //when issued?
                 .setIssuedAt(new Date())
                 //when it will be expired?
-                .setExpiration(new Date(new Date().getTime()+jwtExprations))
+                .setExpiration(new Date(new Date().getTime()+jwtExpirations))
                 //which signature algorithm and my key
                 .signWith(SignatureAlgorithm.HS512,jwtSecret)
                 .compact();
