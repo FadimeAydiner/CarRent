@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -50,6 +51,7 @@ public class ContactMessageController {
     //TODO please read about SQL-INJECTION
 
     //TODO IMPORTANT -> admin endpoint
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<ContactMessageDTO>>getAllContactMessage(){
         List<ContactMessageDTO>contactMessageDTOList = contactMessageService.getAll();
@@ -59,6 +61,7 @@ public class ContactMessageController {
     }
 
     //TODO IMPORTANT -> admin endpoint
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<VRResponse> deleteContactMessage(@PathVariable Long id){
         contactMessageService.deleteContactMessage(id);
@@ -68,6 +71,7 @@ public class ContactMessageController {
     }
 
     //http://localhost:8084/contactmessage/request?id=6
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/request")
     public ResponseEntity<ContactMessageDTO>  getRequestWithRequestParam(@RequestParam("id") Long id){
         ContactMessageDTO contactMessageDTO=contactMessageService.getContactMessage(id);
@@ -77,6 +81,7 @@ public class ContactMessageController {
     }
 
     //http://localhost:8084/contactmessage/6
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("{id}")
     public ResponseEntity<ContactMessageDTO> getRequestWithPath(@PathVariable Long id){
         ContactMessageDTO contactMessageDTO=contactMessageService.getContactMessage(id);
@@ -85,6 +90,7 @@ public class ContactMessageController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<VRResponse> updateContactMessage(@PathVariable Long id,@Valid @RequestBody ContactMessageRequest contactMessageRequest){
 
@@ -97,6 +103,7 @@ public class ContactMessageController {
 
 
     //http://localhost:8084/contactmessage/pages?page=0&size=3&sort=id&direction=DESC
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pages")
     public ResponseEntity<Page<ContactMessageDTO>> getAllContactMessageWithPage(@RequestParam("page") int page,
                                                                                 @RequestParam("size") int size,

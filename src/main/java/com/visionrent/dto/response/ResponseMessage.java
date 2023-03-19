@@ -15,4 +15,8 @@ public class ResponseMessage {
 
      public static final String USER_DELETE_RESPONSE_MESSAGE="User Successfully Deleted";
 
+    public static final String USER_UPDATE_RESPONSE_MESSAGE="User Successfully Updated";
+
+    public static final String USER_PASSWORD_CHANGED_MESSAGE="Password Successfully Changed";
+
 }
