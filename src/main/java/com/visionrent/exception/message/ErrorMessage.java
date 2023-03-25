@@ -1,6 +1,7 @@
 package com.visionrent.exception.message;
 
-public class ErrorMessage {
+public abstract class ErrorMessage {
+
 
     public static final String RESOURCE_NOT_FOUND_MESSAGE = "Resource with id %d not found";
 
@@ -25,4 +26,10 @@ public class ErrorMessage {
     public static final String CURRENT_USER_NOT_DELETE_MESSAGE="You are the logged user. You can not remove yourself";
 
     public static final String PASSWORD_NOT_MATCHED_MESSAGE="Your passwords are not matched";
+
+    public static final String IMAGE_NOT_FOUND_MESSAGE="ImageFile with id %s not found";
+
+    public static final String IMAGE_USED_MESSAGE="ImageFile is used by other car";
+
+
 }

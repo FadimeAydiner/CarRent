@@ -1,6 +1,6 @@
 package com.visionrent.dto.response;
 
-public class ResponseMessage {
+public abstract class ResponseMessage {
 
 /*
     ContactMessage related response messages
@@ -19,4 +19,12 @@ public class ResponseMessage {
 
     public static final String USER_PASSWORD_CHANGED_MESSAGE="Password Successfully Changed";
 
+    //image related response messages
+    public static final String IMAGE_SAVED_RESPONSE_MESSAGE="ImageFile Successfully Uploaded";
+
+    public static final String IMAGE_DELETE_RESPONSE_MESSAGE="ImageFile Successfully Deleted";
+
+    //car related response messages
+
+    public static final String CAR_SAVED_RESPONSE_MESSAGE="Car Successfully Saved";
 }

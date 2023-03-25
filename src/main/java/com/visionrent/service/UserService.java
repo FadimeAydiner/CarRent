@@ -256,9 +256,12 @@ public class UserService {
                 if(roleStr.equals(RoleType.ROLE_ADMIN.getName())){
                     Role adminRole=roleService.findByType(RoleType.ROLE_ADMIN);
                     roles.add(adminRole);
-                }else{
+                }else if(roleStr.equals(RoleType.ROLE_CUSTOMER.getName())){
                     Role userRole=roleService.findByType(RoleType.ROLE_CUSTOMER);
                     roles.add(userRole);
+                }else{
+                    throw new BadRequestException(String.format(ErrorMessage.ROLE_NOT_FOUND_EXCEPTION,roleStr));
+
                 }
             });
         }
