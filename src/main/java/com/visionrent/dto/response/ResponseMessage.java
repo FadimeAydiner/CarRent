@@ -27,4 +27,10 @@ public abstract class ResponseMessage {
     //car related response messages
 
     public static final String CAR_SAVED_RESPONSE_MESSAGE="Car Successfully Saved";
+
+    public static final String CAR_UPDATE_RESPONSE_MESSAGE="Car Successfully Updated";
+    public static final String CAR_DELETE_RESPONSE_MESSAGE="Car Successfully Deleted";
+
+
+
 }

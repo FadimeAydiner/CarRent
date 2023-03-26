@@ -2,6 +2,8 @@ package com.visionrent.repository;
 
 import com.visionrent.domain.Car;
 import org.hibernate.validator.constraints.URL;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +33,7 @@ public interface CarRepository extends JpaRepository<Car,Long> {
 
     @EntityGraph(attributePaths = {"image"})
     Optional<Car> findById(Long id);
+
+    @EntityGraph(attributePaths = {"image"})
+    Page<Car> findAll(Pageable pageable);
 }

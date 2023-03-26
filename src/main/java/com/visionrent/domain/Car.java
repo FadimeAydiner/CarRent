@@ -49,6 +49,7 @@ public class Car {
     @Column(length = 30,nullable = false)
     private String fuelType;
 
+    @Column(nullable = false)
     private Boolean builtIn=false;
 
 

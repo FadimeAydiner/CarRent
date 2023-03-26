@@ -99,10 +99,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(10);
     }
 
-    private static final String[] AUTH_WHITE_LIST = {
+    private static final String [] AUTH_WHITE_LIST= {
             "/v3/api-docs/**",
-            "swagger-ui-html",
-            "swagger-ui/**",
+            "swagger-ui.html",
+            "/swagger-ui/**",
             "/",
             "index.html",
             "/images/**",

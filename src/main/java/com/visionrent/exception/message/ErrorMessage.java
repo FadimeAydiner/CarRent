@@ -32,4 +32,8 @@ public abstract class ErrorMessage {
     public static final String IMAGE_USED_MESSAGE="ImageFile is used by other car";
 
 
+
+    //Reservation
+
+    public static final String RESERVATION_TIME_INCORRECT_MESSAGE="Reservation pick up time or drop off time is not correct";
 }
