@@ -30,7 +30,14 @@ public abstract class ResponseMessage {
 
     public static final String CAR_UPDATE_RESPONSE_MESSAGE="Car Successfully Updated";
     public static final String CAR_DELETE_RESPONSE_MESSAGE="Car Successfully Deleted";
+    public static final String CAR_AVAILABLE_MESSAGE="Car Availability Calculated";
 
 
+
+    //reservation related response messages
+
+    public static final String RESERVATION_CREATED_RESPONSE_MESSAGE="Reservation Successfully Created";
+
+    public static final String RESERVATION_UPDATED_RESPONSE_MESSAGE="Reservation Successfully Updated";
 
 }

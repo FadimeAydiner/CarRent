@@ -36,4 +36,9 @@ public abstract class ErrorMessage {
     //Reservation
 
     public static final String RESERVATION_TIME_INCORRECT_MESSAGE="Reservation pick up time or drop off time is not correct";
+
+    public static final String CAR_NOT_AVAILABLE_MESSAGE="Car is not available for selected time";
+
+
+    public static final String RESERVATION_STATUS_CAN_NOT_CHANGED_MESSAGE="Reservation can not be updated for CANCELLED or DONE reservation";
 }

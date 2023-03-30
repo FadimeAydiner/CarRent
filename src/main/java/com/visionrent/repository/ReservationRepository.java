@@ -4,6 +4,9 @@ import com.visionrent.domain.Car;
 import com.visionrent.domain.Reservation;
 import com.visionrent.domain.User;
 import com.visionrent.domain.enums.ReservationStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,19 +18,25 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 
-    boolean existByCar(Car car);
-    boolean existByUser(User user);
+    boolean existsByCar(Car car);
+    boolean existsByUser(User user);
+
+    @EntityGraph(attributePaths = {"car","car.image"})
+    List<Reservation>findAll();
+
+    @EntityGraph(attributePaths = {"car","car.image"})
+    Page<Reservation>findAll(Pageable pageable);
 
 
+    @Query("SELECT r FROM Reservation r "
+            + "JOIN FETCH Car c on r.car=c.id WHERE "
+            + "c.id=:carId and (r.status not in :status) and :pickUpTime BETWEEN r.pickUpTime and r.dropOffTime "
+            + "or "
+            + "c.id=:carId and (r.status not in :status) and :dropOffTime BETWEEN r.pickUpTime and r.dropOffTime "
+            + "or "
+            + "c.id=:carId and (r.status not in :status) and (r.pickUpTime BETWEEN :pickUpTime and :dropOffTime)")
+    List<Reservation> checkCarStatus(@Param("carId") Long carId, @Param("pickUpTime") LocalDateTime pickUpTime,
+                                     @Param("dropOffTime") LocalDateTime dropOffTime,@Param("status") ReservationStatus[] status);
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH Car c ON r.id WHERE " +
-            "c.id=:carId AND (r.status NOT IN :status) AND :pickUpTime BETWEEN r.pickUpTime AND r.dropOffTime " +
-            "OR " +
-            "c.id=:carId AND (r.status NOT IN :status) AND :dropOfTime BETWEEN r.pickUpTime AND r.dropOffTime " +
-            "OR " +
-            "c.id=: carId AND (r.status NOT IN :status) AND (r.pickUpTime BETWEEN :pickUpTime AND :dropOffTime)")
-    List<Reservation>checkCarStatus (@Param("carId") Long carId,
-                                     @Param("pickUpTime")LocalDateTime pickUpTime,
-                                     @Param("dropOffTime") LocalDateTime dropOffTime,
-                                     @Param("status")ReservationStatus[]status);
+
 }

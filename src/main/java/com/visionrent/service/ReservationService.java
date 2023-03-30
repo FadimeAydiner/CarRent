@@ -4,8 +4,11 @@ import com.visionrent.domain.Car;
 import com.visionrent.domain.Reservation;
 import com.visionrent.domain.User;
 import com.visionrent.domain.enums.ReservationStatus;
+import com.visionrent.dto.ReservationDTO;
 import com.visionrent.dto.request.ReservationRequest;
+import com.visionrent.dto.request.ReservationUpdateRequest;
 import com.visionrent.exception.BadRequestException;
+import com.visionrent.exception.ResourceNotFoundException;
 import com.visionrent.exception.message.ErrorMessage;
 import com.visionrent.mapper.ReservationMapper;
 import com.visionrent.repository.ReservationRepository;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -30,13 +34,79 @@ public class ReservationService {
         checkReservationTimeIsCorrect(reservationRequest.getPickUpTime(),reservationRequest.getDropOffTime());
 
         //we have to check if this car is free or reservation
-        checkCarAvailability(car,reservationRequest.getPickUpTime(),reservationRequest.getDropOffTime());
+        boolean carStatus=checkCarAvailability(car,reservationRequest.getPickUpTime(),reservationRequest.getDropOffTime());
+
+        Reservation reservation=reservationMapper.reservationRequestToReservation(reservationRequest);
+        if(carStatus){
+            reservation.setStatus(ReservationStatus.CREATED);
+        }else{
+            throw new BadRequestException(ErrorMessage.CAR_NOT_AVAILABLE_MESSAGE);
+        }
+
+        reservation.setCar(car);
+        reservation.setUser(user);
+        Double totalPrice=getTotalPrice(car,reservationRequest.getPickUpTime(),reservationRequest.getDropOffTime());
+        reservation.setTotalPrice(totalPrice);
+
+        reservationRepository.save(reservation);
 
     }
 
-    private boolean checkCarAvailability(Car car,LocalDateTime pickUpTime,LocalDateTime dropOffTime){
-        //List<Reservation> existReservations=
-        return false;
+    public void updateReservation(Long reservationId, Car car, ReservationUpdateRequest reservationUpdateRequest){
+        Reservation reservation=getById(reservationId);
+
+        //cancelled or done reservation should not be updated
+        if(reservation.getStatus().equals(ReservationStatus.CANCELLED)||reservation.getStatus().equals(ReservationStatus.DONE)){
+            throw new BadRequestException(ErrorMessage.RESERVATION_STATUS_CAN_NOT_CHANGED_MESSAGE);
+        }
+
+        if(reservationUpdateRequest.getStatus()!=null && reservationUpdateRequest.getStatus()==ReservationStatus.CREATED){
+            checkReservationTimeIsCorrect(reservationUpdateRequest.getPickUpTime(),reservationUpdateRequest.getDropOffTime());;
+        }
+
+        List<Reservation> conflictReservations=getConflictReservations(car,reservationUpdateRequest.getPickUpTime(),reservationUpdateRequest.getDropOffTime());
+
+        if(!conflictReservations.isEmpty()){
+            if(!(conflictReservations.size()==1 && conflictReservations.get(0).getId().equals(reservationId))){
+                throw  new BadRequestException(ErrorMessage.CAR_NOT_AVAILABLE_MESSAGE);
+            }
+        }
+
+        Double totalPrice=getTotalPrice(car,reservationUpdateRequest.getPickUpTime(),reservationUpdateRequest.getDropOffTime());
+        reservation.setTotalPrice(totalPrice);
+        reservation.setCar(car);
+        reservation.setPickUpTime(reservationUpdateRequest.getPickUpTime());;
+        reservation.setDropOffTime(reservationUpdateRequest.getDropOffTime());
+        reservation.setPickUpLocation(reservationUpdateRequest.getPickUpLocation());
+        reservation.setDropOffLocation(reservationUpdateRequest.getDropOffLocation());
+        reservation.setStatus(reservationUpdateRequest.getStatus());
+        reservationRepository.save(reservation);
+
+    }
+
+
+
+    //method name should be getReservationByReservationId
+    public Reservation getById(Long id){
+        Reservation reservation=reservationRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE));
+        return reservation;
+    }
+    public Double getTotalPrice(Car car,LocalDateTime pickUpTime,LocalDateTime dropOfTime){
+        Long minutes= ChronoUnit.MINUTES.between(pickUpTime,dropOfTime);
+        double hours=Math.ceil(minutes/60.0);
+        return car.getPricePerHour()*hours;
+    }
+
+    public boolean checkCarAvailability(Car car,LocalDateTime pickUpTime,LocalDateTime dropOffTime){
+        List<Reservation> existReservations=getConflictReservations(car,pickUpTime,dropOffTime);
+
+        return existReservations.isEmpty();
+    }
+
+    public List<ReservationDTO> getAllReservations(){
+        List<Reservation> reservations=reservationRepository.findAll();
+        return reservationMapper.map(reservations);
     }
 
     private List<Reservation> getConflictReservations(Car car,LocalDateTime pickUpTime,LocalDateTime dropOffTime){
@@ -45,8 +115,8 @@ public class ReservationService {
         }
         ReservationStatus [] status={ReservationStatus.CANCELLED,ReservationStatus.DONE};
 
-      //  List<Reservation> existReservations=reservationRepository.
-        return null;
+       List<Reservation> existReservations=reservationRepository.checkCarStatus(car.getId(),pickUpTime,dropOffTime,status);
+        return existReservations;
 
     }
     private void checkReservationTimeIsCorrect(LocalDateTime pickUpTime,LocalDateTime dropOffTime){
@@ -66,5 +136,7 @@ public class ReservationService {
         }
 
     }
+
+
 
 }
