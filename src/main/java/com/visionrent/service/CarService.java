@@ -22,6 +22,8 @@ import java.util.Set;
 public class CarService {
 
     @Autowired
+    private ReservationService reservationService;
+    @Autowired
     private CarRepository carRepository;
     @Autowired
     private ImageFileService imageFileService;
@@ -106,6 +108,10 @@ public class CarService {
         }
         //TODO new implementation is needed after reservation part
 
+        boolean exist=reservationService.existByCar(car);
+        if(exist){
+            throw new BadRequestException(String.format(ErrorMessage.CAR_USED_BY_RESERVATION_MESSAGE,id));
+        }
         carRepository.delete(car);
 
     }

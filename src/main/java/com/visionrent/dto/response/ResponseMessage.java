@@ -39,5 +39,6 @@ public abstract class ResponseMessage {
     public static final String RESERVATION_CREATED_RESPONSE_MESSAGE="Reservation Successfully Created";
 
     public static final String RESERVATION_UPDATED_RESPONSE_MESSAGE="Reservation Successfully Updated";
+    public static final String RESERVATION_DELETED_RESPONSE_MESSAGE="Reservation Successfully Deleted";
 
 }

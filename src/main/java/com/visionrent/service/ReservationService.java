@@ -13,6 +13,8 @@ import com.visionrent.exception.message.ErrorMessage;
 import com.visionrent.mapper.ReservationMapper;
 import com.visionrent.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -137,6 +139,45 @@ public class ReservationService {
 
     }
 
+    public ReservationDTO getReservationDTO(Long id){
+        Reservation reservation=getById(id);
+        return reservationMapper.reservationToReservationDTO(reservation);
+    }
 
+    public ReservationDTO findByReservationIdAndLoggedInUser(Long id,User user){
+        Reservation reservation=reservationRepository.findByIdAndUser(id,user).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE,id)));
+        return reservationMapper.reservationToReservationDTO(reservation);
+    }
+
+    public Page<ReservationDTO>getReservationPage(Pageable pageable){
+        Page<Reservation>reservationPage=reservationRepository.findAll(pageable);
+        return getReservationDTOPage(reservationPage);
+    }
+    public Page<ReservationDTO> findReservationPageByUser(User user, Pageable pageable){
+        Page<Reservation>reservationPage=reservationRepository.findAllByUser(user,pageable);
+        return getReservationDTOPage(reservationPage);
+    }
+
+    //mapper from reservationPage->reservationDTOPage
+    private Page<ReservationDTO> getReservationDTOPage(Page<Reservation>reservationPage){
+        return reservationPage.map(reservation -> reservationMapper.reservationToReservationDTO(reservation));
+
+    }
+
+    public void removeByReservationId(Long reservationId){
+
+        boolean exist=reservationRepository.existsById(reservationId);
+
+        if(!exist){
+            throw new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE,reservationId));
+
+        }
+        reservationRepository.deleteById(reservationId);
+    }
+
+    public boolean existByCar(Car car){
+        return reservationRepository.existsByCar(car);
+    }
 
 }

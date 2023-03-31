@@ -284,4 +284,8 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public List<User>getUsers(){
+        return userRepository.findAll();
+    }
+
 }

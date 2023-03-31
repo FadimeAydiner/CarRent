@@ -15,6 +15,10 @@ import com.visionrent.service.UserService;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -114,5 +118,71 @@ public class ReservationController {
         List<ReservationDTO> allReservations=reservationService.getAllReservations();
         return ResponseEntity.ok(allReservations);
     }
+    @GetMapping("/admin/auth/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ReservationDTO>> getAllUserReservationsByPage(@RequestParam("userId")Long userId,
+                                                                             @RequestParam("page")int page,
+                                                                             @RequestParam("size") int size,
+                                                                             @RequestParam("sort") String prop,
+                                                                             @RequestParam(value="direction",required = false,defaultValue = "DESC")Sort.Direction direction){
 
+        Pageable pageable =PageRequest.of(page,size,Sort.by(direction,prop));
+        User user=userService.getById(userId);
+
+        Page<ReservationDTO> allReservations=reservationService.findReservationPageByUser(user,pageable);
+        return ResponseEntity.ok(allReservations);
+
+    }
+
+    @GetMapping("/admin/all/pages")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ReservationDTO>> getAllUserReservationByPage(@RequestParam("page")int page,
+                                                                                  @RequestParam("size") int size,
+                                                                                  @RequestParam("sort") String prop,
+                                                                                  @RequestParam(value="direction",required = false,defaultValue = "DESC")Sort.Direction direction){
+
+        Pageable pageable =PageRequest.of(page,size,Sort.by(direction,prop));
+
+
+        Page<ReservationDTO> allReservations=reservationService.getReservationPage(pageable);
+        return ResponseEntity.ok(allReservations);
+
+    }
+    @GetMapping("{id}/admin")
+    public ResponseEntity<ReservationDTO> getReservationById(@PathVariable Long id){
+        ReservationDTO reservationDTO=reservationService.getReservationDTO(id);
+        return ResponseEntity.ok(reservationDTO);
+    }
+
+    @GetMapping("/auth/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ReservationDTO>> getLoggedInUserReservationsByPage(@RequestParam("page")int page,
+                                                                             @RequestParam("size") int size,
+                                                                             @RequestParam("sort") String prop,
+                                                                             @RequestParam(value="direction",required = false,defaultValue = "DESC")Sort.Direction direction){
+
+        Pageable pageable =PageRequest.of(page,size,Sort.by(direction,prop));
+        User user=userService.getCurrentUser();
+
+        Page<ReservationDTO> allReservations=reservationService.findReservationPageByUser(user,pageable);
+        return ResponseEntity.ok(allReservations);
+
+    }
+
+    @GetMapping("/{id}/auth")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
+    public ResponseEntity<ReservationDTO>getLoggedInUserReservationById(@PathVariable Long id){
+        User user=userService.getCurrentUser();
+        ReservationDTO reservationDTO=reservationService.findByReservationIdAndLoggedInUser(id,user);
+        return ResponseEntity.ok(reservationDTO);
+    }
+
+    @DeleteMapping("/admin/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<VRResponse> deleteReservation(@PathVariable Long id){
+        reservationService.removeByReservationId(id);
+        VRResponse response=new VRResponse(ResponseMessage.RESERVATION_DELETED_RESPONSE_MESSAGE,true);
+
+        return ResponseEntity.ok(response);
+    }
 }

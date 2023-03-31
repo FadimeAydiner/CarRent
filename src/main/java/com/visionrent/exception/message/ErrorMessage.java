@@ -41,4 +41,12 @@ public abstract class ErrorMessage {
 
 
     public static final String RESERVATION_STATUS_CAN_NOT_CHANGED_MESSAGE="Reservation can not be updated for CANCELLED or DONE reservation";
+
+
+
+    public static final String CAR_USED_BY_RESERVATION_MESSAGE="Car can not be deleted. Car is used by a reservation";
+
+
+
+    public static final String EXCEL_REPORT_ERROR_MESSAGE="Error occurred while generating excel report";
 }
