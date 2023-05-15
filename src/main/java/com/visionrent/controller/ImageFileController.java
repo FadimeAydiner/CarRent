@@ -17,15 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/*
-
-       REST -> Web Services
-       SOAP -> Web Services
-    */
-//Todo please check and implement easy SOAP web service client
-//1.find a public web service
-//2.connect to this
-//3.create a SOAP web service and make a call from postman
 @RestController
 @RequestMapping("/files")
 public class ImageFileController {
@@ -43,14 +34,16 @@ public class ImageFileController {
    return ResponseEntity.ok(response);
 
  }
+
+
     //http://localhost:8080/files/display/089ff884-00b0-443d-a82c-00a113c683ab
 @GetMapping("/display/{id}")
  public ResponseEntity<byte[]> displayImage(@PathVariable String id){
      ImageFile imageFile=imageFileService.getImageById(id);
-   /*another way of initializing the http header,
-    we are injecting this instance into response entity constructor
-    */
 
+     //setContentType(MediaType.IMAGE_JPEG); ile headera gelen byte türündeki verinin başka
+    // bir Media türüne çevrilerek response oluşturulacağını söylüyoruz.
+    //https://www.geeksforgeeks.org/http-headers-content-type/#
     HttpHeaders header=new HttpHeaders();
     header.setContentType(MediaType.IMAGE_JPEG);
     return new ResponseEntity<>(imageFile.getImageData().getData(), header, HttpStatus.OK);
@@ -59,6 +52,9 @@ public class ImageFileController {
  @GetMapping("/download/{id}")
  public ResponseEntity<byte[]>downloadImage(@PathVariable String id){
      ImageFile imageFile=imageFileService.getImageById(id);
+
+     //https://www.geeksforgeeks.org/http-headers-content-disposition/
+     //Dosyanın nasıl kaydedileceğini belirtmek için kullanılır
      return ResponseEntity.ok()
              .header(HttpHeaders.CONTENT_DISPOSITION,
                      "attachment;filename="+ imageFile.getName())
@@ -80,8 +76,9 @@ public ResponseEntity<VRResponse> deleteImageFile(@PathVariable String id){
      VRResponse response=new VRResponse(ResponseMessage.IMAGE_DELETE_RESPONSE_MESSAGE,true);
     return ResponseEntity.ok(response);
     /*
-    the same usage
+   return ResponseEntity.ok(response);
     return ResponseEntity.ok().body(response);
+    ikisi de aynı
      */
 
 

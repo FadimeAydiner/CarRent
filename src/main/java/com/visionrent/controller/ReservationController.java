@@ -9,6 +9,7 @@ import com.visionrent.dto.request.ReservationUpdateRequest;
 import com.visionrent.dto.response.CarAvailabilityResponse;
 import com.visionrent.dto.response.ResponseMessage;
 import com.visionrent.dto.response.VRResponse;
+import com.visionrent.exception.message.ErrorMessage;
 import com.visionrent.service.CarService;
 import com.visionrent.service.ReservationService;
 import com.visionrent.service.UserService;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.plaf.PanelUI;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -43,10 +46,7 @@ public class ReservationController {
     @Autowired
     private CarService carService;
     /**
-     * US: a user can make a reservation for him/herself.
-     * @param carId carID for reservation
-     * @param reservationRequest reservation information
-     * @return VRResponse
+
      * {
      *     "pickUpTime":"07/16/2022 19:00:00",
      *     "dropOffTime":"07/17/2022 21:00:00",
@@ -55,6 +55,8 @@ public class ReservationController {
      * }
      * http://localhost:8080/reservations/add?carId=1
      */
+
+    //current user kendi için rezervasyon yapacak
     @PostMapping("/add")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     public ResponseEntity<VRResponse> makeReservation(@RequestParam("carId") Long carId,
@@ -70,6 +72,8 @@ public class ReservationController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    //admin herhangi bir kullanıcı için rezervasyon yapacak
     @PostMapping("/add/auth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VRResponse> addReservation(@RequestParam("carId") Long carId,
@@ -104,14 +108,35 @@ public class ReservationController {
                                                           @RequestParam("dropOffTime")@DateTimeFormat(pattern = "MM/dd/yyyy HH:mm:ss")LocalDateTime dropOffTime){
         Car car=carService.findCarById(carId);
         boolean isAvailable=reservationService.checkCarAvailability(car,pickUpTime,dropOffTime);
-        Double totalPrice= reservationService.getTotalPrice(car,pickUpTime,dropOffTime);
 
-        //Todo if it is not available, return another response WITH->pOSSIBLE CANDIDATE TIMES
-        VRResponse response=new CarAvailabilityResponse(ResponseMessage.CAR_AVAILABLE_MESSAGE,true,isAvailable,totalPrice);
+        if (!isAvailable) {
+            List<String> candidateTimes = new ArrayList<>();
+            LocalDateTime rangeStart = pickUpTime.minusDays(15);
+            LocalDateTime rangeEnd = dropOffTime.plusDays(15);
+            while (rangeStart.isBefore(rangeEnd)) {
+                LocalDateTime candidatePickupTime = rangeStart.plusDays(1);
+                LocalDateTime candidateDropOffTime = candidatePickupTime.plusDays(2);
+                boolean isCandidateAvailable = reservationService.checkCarAvailability(car, candidatePickupTime, candidateDropOffTime);
+                if (isCandidateAvailable) {
+                    Double candidateTotalPrice = reservationService.getTotalPrice(car, candidatePickupTime, candidateDropOffTime);
+                    String candidateTimeRange = candidatePickupTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + " - " +
+                                                candidateDropOffTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                   candidateTimes.add(candidateTimeRange /* + " (Total Price: " + candidateTotalPrice + ")"*/);
+                    if (candidateTimes.size()>30){
+                        break;
+                    }
+                }
+                rangeStart = rangeStart.plusDays(1);
+            }
+            VRResponse response = new CarAvailabilityResponse(ErrorMessage.CAR_NOT_AVAILABLE_MESSAGE,true, candidateTimes);
+            return ResponseEntity.ok(response);
+        } else {
+            Double totalPrice = reservationService.getTotalPrice(car, pickUpTime, dropOffTime);
+            VRResponse response = new CarAvailabilityResponse(ResponseMessage.CAR_AVAILABLE_MESSAGE, true, true, totalPrice);
+            return ResponseEntity.ok(response);
 
-        return new ResponseEntity<>(response,HttpStatus.OK);
 
-    }
+    }}
     @GetMapping("/admin/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ReservationDTO>> getAllReservations(){

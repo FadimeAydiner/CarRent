@@ -22,17 +22,12 @@ public class ImageData {
 
     /*
         Lob
-        Specifies that a persistent propery or field should be
-        persisted as a large object to a database-supported loarge
-        object type.
+        Database de yüksek boyutlu veri saklamamızı sağlayan veri tipidir.
+        Veriyi btye dizisi halinde saklar
      */
     @Lob
     private byte[] data;
 
-    /*
-        custom constructor to initialize the image data object
-        @param data array of bytes
-     */
     public ImageData(byte[] data){
         this.data=data;
     }

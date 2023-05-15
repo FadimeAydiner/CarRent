@@ -19,7 +19,7 @@ public class ImageFile {
 
     @Id
     @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name="uuid",strategy="uuid2")//unique String id that we will have
+    @GenericGenerator(name="uuid",strategy="uuid2")//Burdan unid string id alacağız
     private String id;
 
     private String name;
@@ -29,7 +29,7 @@ public class ImageFile {
     private long length;
 
     /*
-        Cascading: without imagedata there is no meaning of imageFile
+       Burda onetoone bağlantı ile her imageFile ı bir imageData nesne ile ilişkilendirdik.
      */
     @OneToOne(cascade = CascadeType.ALL)
     private ImageData imageData;

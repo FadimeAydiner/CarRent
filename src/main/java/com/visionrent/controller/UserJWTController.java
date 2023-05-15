@@ -45,10 +45,10 @@ public class UserJWTController {
     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=
             new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword());
 
-    //we are authenticate the user here
+    //burada kullanıcıyı authenticate (doğrulama) yapıyor
     Authentication authentication=authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-    //we need userDetails to create a token
+    //token için UserDetails kullanılıyor
     UserDetails userDetails= (UserDetails) authentication.getPrincipal();
 
     String jwtToken=jwtUtils.generateToken(userDetails);

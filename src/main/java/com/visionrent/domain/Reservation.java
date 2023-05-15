@@ -22,11 +22,6 @@ public class Reservation {
     private Long id;
 
 
-    //Clean Code
-    /*
-    All entities have the same naming as "id"
-    It would be a better way to change the naming as revervationId/userId/...
-     */
     @OneToOne
     @JoinColumn(name = "car_id",referencedColumnName = "id")
     private Car car;
@@ -49,7 +44,7 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30,nullable = false)
-    //TODO check the reason of length usage here
+
     private ReservationStatus status;
 
     @Column(nullable = false)

@@ -1,7 +1,6 @@
 package com.visionrent.report;
 
-import com.visionrent.domain.Role;
-import com.visionrent.domain.User;
+import com.visionrent.domain.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -31,6 +30,9 @@ public class ExcelReporter {
             "DropOffTime","PickUpLocation","DropOffLocation","Status"};
 
 
+    static String SHEET_PAYMENT = "Payments";
+    static String[] PAYMENT_HEADERS = { "id", "ReservationId", "CarId", "CustomerId", "CustomerFullName", "CustomerPhoneNumber",
+            "CardHolder","expirationDate","securityCode","cardNumber","paymentDate"};
     public static ByteArrayInputStream getUserExcelReport(List<User> users) throws IOException {
         Workbook workbook=new XSSFWorkbook();
         ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
@@ -46,7 +48,7 @@ public class ExcelReporter {
             cell.setCellValue(USER_HEADERS[i]);
         }
 
-        //header part finished
+        //header part sonu
 
         int rowId=1;
         for(User user:users){
@@ -75,4 +77,128 @@ public class ExcelReporter {
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
+    public static ByteArrayInputStream getCarExcelReport(List<Car> cars) throws IOException {
+        Workbook workbook=new XSSFWorkbook();
+        ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+
+        Sheet sheet=workbook.createSheet(SHEET_CAR);
+
+        //header part
+
+        Row headerRow=sheet.createRow(0);
+
+        for(int i=0;i< CAR_HEADERS.length;i++){
+            Cell cell=headerRow.createCell(i);
+            cell.setCellValue(CAR_HEADERS[i]);
+        }
+
+        //header part sonu
+
+
+        int rowId=1;
+        for(Car car:cars) {
+            Row row = sheet.createRow(rowId++);
+            row.createCell(0).setCellValue(car.getId());
+            row.createCell(1).setCellValue(car.getModel());
+            row.createCell(2).setCellValue(car.getDoors());
+            row.createCell(3).setCellValue(car.getSeats());
+            row.createCell(4).setCellValue(car.getLuggage());
+            row.createCell(5).setCellValue(car.getTransmission());
+            row.createCell(6).setCellValue(car.isAirConditioning());
+            row.createCell(7).setCellValue(car.getAge());
+            row.createCell(8).setCellValue(car.getPricePerHour());
+            row.createCell(9).setCellValue(car.getFuelType());
+
+        }
+
+        workbook.write(outputStream);
+        workbook.close();
+
+        return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+
+    public static ByteArrayInputStream getReservationExcelReport(List<Reservation> reservations) throws IOException {
+        Workbook workbook=new XSSFWorkbook();
+        ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+
+        Sheet sheet=workbook.createSheet(SHEET_RESERVATION);
+
+        //header part
+
+        Row headerRow=sheet.createRow(0);
+
+        for(int i=0;i< RESERVATION_HEADERS.length;i++){
+            Cell cell=headerRow.createCell(i);
+            cell.setCellValue(RESERVATION_HEADERS[i]);
+        }
+
+        //header part sonu
+
+
+        int rowId=1;
+        for(Reservation reservation:reservations) {
+            Row row = sheet.createRow(rowId++);
+            row.createCell(0).setCellValue(reservation.getId());
+            row.createCell(1).setCellValue(reservation.getCar().getId());
+            row.createCell(2).setCellValue(reservation.getCar().getModel());
+            row.createCell(3).setCellValue(reservation.getUser().getId());
+            row.createCell(4).setCellValue(reservation.getUser().getFirstName()+" "+reservation.getUser().getLastName());
+            row.createCell(5).setCellValue(reservation.getUser().getPhoneNumber());
+            row.createCell(6).setCellValue(String.valueOf(reservation.getPickUpTime()));
+            row.createCell(7).setCellValue(String.valueOf(reservation.getDropOffTime()));
+            row.createCell(8).setCellValue(reservation.getPickUpLocation());
+            row.createCell(9).setCellValue(reservation.getDropOffLocation());
+            row.createCell(10).setCellValue(String.valueOf(reservation.getStatus()));
+
+        }
+
+        workbook.write(outputStream);
+        workbook.close();
+
+        return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+
+
+
+    public static ByteArrayInputStream getPaymentExcelReport(List<Payment> payments) throws IOException {
+        Workbook workbook=new XSSFWorkbook();
+        ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+
+        Sheet sheet=workbook.createSheet(SHEET_PAYMENT);
+
+        //header part
+
+        Row headerRow=sheet.createRow(0);
+
+        for(int i=0;i< PAYMENT_HEADERS.length;i++){
+            Cell cell=headerRow.createCell(i);
+            cell.setCellValue(PAYMENT_HEADERS[i]);
+        }
+
+        //header part sonu
+
+
+        int rowId=1;
+        for(Payment payment:payments) {
+            Row row = sheet.createRow(rowId++);
+            row.createCell(0).setCellValue(payment.getId());
+            row.createCell(1).setCellValue(payment.getReservation().getId());
+            row.createCell(2).setCellValue(payment.getReservation().getCar().getId());
+            row.createCell(3).setCellValue(payment.getReservation().getUser().getId());
+            row.createCell(4).setCellValue(payment.getReservation().getUser().getFirstName()+payment.getReservation().getUser().getLastName());
+            row.createCell(5).setCellValue(payment.getReservation().getUser().getPhoneNumber());
+            row.createCell(6).setCellValue(payment.getCardHolder());
+            row.createCell(7).setCellValue(payment.getExpirationDate());
+            row.createCell(8).setCellValue(payment.getSecurityCode());
+            row.createCell(9).setCellValue(payment.getCardNumber());
+            row.createCell(10).setCellValue(String.valueOf(payment.getPaymentDate()));
+
+
+        }
+
+        workbook.write(outputStream);
+        workbook.close();
+
+        return new ByteArrayInputStream(outputStream.toByteArray());
+    }
 }

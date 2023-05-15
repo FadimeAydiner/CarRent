@@ -30,11 +30,11 @@ public class JwtUtils {
 
     public String generateToken(UserDetails userDetails){
         return Jwts.builder().setSubject(userDetails.getUsername())
-                //when issued?
+                //ne zaman oluşturuldu?
                 .setIssuedAt(new Date())
-                //when it will be expired?
+                //ne zaman süresi dolacak?
                 .setExpiration(new Date(new Date().getTime()+jwtExpirations))
-                //which signature algorithm and my key
+                //signature algorithm ve  key
                 .signWith(SignatureAlgorithm.HS512,jwtSecret)
                 .compact();
     }
@@ -52,11 +52,7 @@ public class JwtUtils {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
-            //TODO: check diffrence between | and ||
-            // | is check all conditions but || brokes the condition if one of the condition is true or false does not look at the other conditions.
-            //in here we need to check all exception so we use |
 
-            //homework create custom messages for any possible jwt exceptions
         }catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException |IllegalArgumentException e){
             LOGGER.error(ErrorMessage.JWT_TOKEN_MESSAGE);
         }

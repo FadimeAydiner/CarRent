@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 @Service
 public class ReservationService {
@@ -32,10 +34,10 @@ public class ReservationService {
 
 
     public void createReservation(ReservationRequest reservationRequest, User user, Car car){
-        //we need to check the times
+        //pick up ve drop off zamanlarını kontrol edeceğiz
         checkReservationTimeIsCorrect(reservationRequest.getPickUpTime(),reservationRequest.getDropOffTime());
 
-        //we have to check if this car is free or reservation
+        //araba rezerve edilmiş mi diye kontrol ediyoruz
         boolean carStatus=checkCarAvailability(car,reservationRequest.getPickUpTime(),reservationRequest.getDropOffTime());
 
         Reservation reservation=reservationMapper.reservationRequestToReservation(reservationRequest);
@@ -55,9 +57,9 @@ public class ReservationService {
     }
 
     public void updateReservation(Long reservationId, Car car, ReservationUpdateRequest reservationUpdateRequest){
-        Reservation reservation=getById(reservationId);
+        Reservation reservation=getReservationByReservationId(reservationId);
 
-        //cancelled or done reservation should not be updated
+        //cancelled veya  done reservation güncellenemez
         if(reservation.getStatus().equals(ReservationStatus.CANCELLED)||reservation.getStatus().equals(ReservationStatus.DONE)){
             throw new BadRequestException(ErrorMessage.RESERVATION_STATUS_CAN_NOT_CHANGED_MESSAGE);
         }
@@ -88,10 +90,10 @@ public class ReservationService {
 
 
 
-    //method name should be getReservationByReservationId
-    public Reservation getById(Long id){
+
+    public Reservation getReservationByReservationId(Long id){
         Reservation reservation=reservationRepository.findById(id).orElseThrow(()->
-                new ResourceNotFoundException(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE));
+                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE,id)));
         return reservation;
     }
     public Double getTotalPrice(Car car,LocalDateTime pickUpTime,LocalDateTime dropOfTime){
@@ -102,6 +104,8 @@ public class ReservationService {
 
     public boolean checkCarAvailability(Car car,LocalDateTime pickUpTime,LocalDateTime dropOffTime){
         List<Reservation> existReservations=getConflictReservations(car,pickUpTime,dropOffTime);
+
+
 
         return existReservations.isEmpty();
     }
@@ -121,16 +125,19 @@ public class ReservationService {
         return existReservations;
 
     }
+
+
     private void checkReservationTimeIsCorrect(LocalDateTime pickUpTime,LocalDateTime dropOffTime){
 
         LocalDateTime now=LocalDateTime.now();
+        //pick up time anlık tarih ve saatten önce olamaz
         if(pickUpTime.isBefore(now)){
             throw new BadRequestException(ErrorMessage.RESERVATION_TIME_INCORRECT_MESSAGE);
              }
 
-        //pick up time can not be equal to drop off time
+        //pick up time ,drop off time'a eşit olamaz
         boolean isEqual=pickUpTime.isEqual(dropOffTime);
-        //pick up time can not be later than drop off time
+        //pick up time ,drop off'tan sonra olamaz
         boolean isBefore=pickUpTime.isBefore(dropOffTime);
 
         if(isEqual || !isBefore){
@@ -140,7 +147,7 @@ public class ReservationService {
     }
 
     public ReservationDTO getReservationDTO(Long id){
-        Reservation reservation=getById(id);
+        Reservation reservation=getReservationByReservationId(id);
         return reservationMapper.reservationToReservationDTO(reservation);
     }
 

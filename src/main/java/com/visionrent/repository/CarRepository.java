@@ -16,18 +16,17 @@ import java.util.Optional;
 @Repository
 public interface CarRepository extends JpaRepository<Car,Long> {
 
-    /*
-        @param id  imageId
-        @return number of cars that has image with this id
-     */
     @Query("SELECT count(*) from Car c JOIN c.image im WHERE im.id=:id")
     Integer findCarCountByImageId(@Param("id")String id);
 
-    //@Query( EXIST) do with instead of count
+
 
     @Query("SELECT c FROM Car c JOIN c.image im where im.id=:id")
     List<Car> findCarsByImageId(@Param("id") String id);
 
+
+    //image'i de listede göstermek istiyorum. Ancak image bilgisi OnaeToMany ile ImageFile da yer aldı.
+    //onu almak için  @EntityGraph(attributePaths = {"image"}) kullanıyoruz.
     @EntityGraph(attributePaths = {"image"})
     List<Car> findAll();
 

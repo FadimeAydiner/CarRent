@@ -1,9 +1,12 @@
 package com.visionrent.controller;
 
+import com.visionrent.domain.Car;
 import com.visionrent.dto.CarDTO;
+import com.visionrent.dto.response.CarAvailabilityResponse;
 import com.visionrent.dto.response.ResponseMessage;
 import com.visionrent.dto.response.VRResponse;
 import com.visionrent.service.CarService;
+import com.visionrent.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -11,12 +14,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,6 +32,8 @@ public class CarController {
 
     @Autowired
     private CarService carService;
+
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/{imageId}/add")
@@ -36,6 +45,8 @@ public class CarController {
 
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
+
+
 
     //http://localhost:8084/car/visitors/all
     @GetMapping("/visitors/all")

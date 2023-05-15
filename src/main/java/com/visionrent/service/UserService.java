@@ -53,20 +53,19 @@ public class UserService {
                 .orElseThrow(()->new ResourceNotFoundException(
                         String.format(ErrorMessage.USER_NOT_FOUND_MESSAGE,email)));
     }
-
+//UserJWTController metotları
     public void saveUser(RegisterRequest registerRequest){
         if(userRepository.existsByEmail(registerRequest.getEmail())){
             throw new ConflictException(ErrorMessage.EMAIL_ALREADY_EXISTS_MESSAGE);
         }
-        //we have to encode our password before saving into DB.
+        //şifreyi veri tabanına kaydetmeden önce encode işlemi yapıyoruz.
         String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
-
-        //we rae searching customer role in db
+        //customer role var mı diye bakıyoruz
         Role role = roleService.findByType(RoleType.ROLE_CUSTOMER);
         Set<Role> roles = new HashSet<>();
         roles.add(role);
 
-        //builder design pattern -> @Builder
+        //yeni bi kullanıcı oluşturup RegisterRequest nesnesinden gelen verileri kullanıcıya ekliyoruz.
         User user = new User();
         user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());
@@ -76,9 +75,11 @@ public class UserService {
         user.setAddress(registerRequest.getAddress());
         user.setZipCode(registerRequest.getZipCode());
         user.setRoles(roles);
+        //kullanıcıyı veri tabanına kaydediyoruz
         userRepository.save(user);
     }
 
+    //UserController methodları
 
     public List<UserDTO>getAllUsers(){
         List<User> users=userRepository.findAll();
@@ -86,22 +87,15 @@ public class UserService {
         return userDTOS;
     }
 
-    public UserDTO getUserById(Long id){
-        User user=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(
-                String.format(ErrorMessage.USER_NOT_FOUND_MESSAGE,id)));
-        return userMapper.userToUserDTO(user);
-    }
-
     public UserDTO getPrincipal(){
         User currentUser=getCurrentUser();
         UserDTO userDTO=userMapper.userToUserDTO(currentUser);
+        System.out.println(currentUser.getId());
+        System.out.println(userDTO.getId());
         return userDTO;
     }
 
-    /**
-     * From security context we are fetching current user information
-     * @return
-     */
+    //SecurityContext'ten o an sistemde olan kullanıcı bilgileriniz alıyoruz
     public User getCurrentUser(){
 
         String email= SecurityUtils.getCurrentUserLogin().orElseThrow(()->
@@ -111,34 +105,34 @@ public class UserService {
         return user;
     }
 
+    public UserDTO getUserById(Long id){
+        User user=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(
+                String.format(ErrorMessage.USER_NOT_FOUND_MESSAGE,id)));
+        return userMapper.userToUserDTO(user);
+    }
+
+
+
+    //delete
+
+    public void removeUserById(Long id)  {
+        User user=getById(id);
+
+        //O an sisteme giriş yapmış olan kullanıcının silinmesine izin vermiyoruz
+        if(user==getCurrentUser()){
+            throw new BadRequestException(ErrorMessage.CURRENT_USER_NOT_DELETE_MESSAGE);
+        }
+
+        //kullanıcının builtIn özelliği true ise kullanıcıyı silebiliriz değilse silemeyiz bunun için checkUserBuiltIn(user);metodunu yazdım aşağıda.
+        checkUserBuiltIn(user);
+        userRepository.deleteById(user.getId());
+    }
+
     public User getById(Long id){
         User user=userRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE,id)));
 
         return user;
-    }
-
-    //delete
-
-    //TODO the login user should not be deleted
-    // add an algorithm if the user that wanted to be deleted must not be logged in user
-    public void removeUserById(Long id)  {
-        User user=getById(id);
-        //TODO your own repo you can change this function and add more endpoints
-        // to change the built in property in DB
-        // but check the entity class for default value
-
-        //Current user
-        if(user==getCurrentUser()){
-            throw new BadRequestException(ErrorMessage.CURRENT_USER_NOT_DELETE_MESSAGE);
-        }
-
-       //we are checking if we are allowed to delete this user
-      /*  if(user.getBuiltIn()){
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }*/
-        checkUserBuiltIn(user);
-        userRepository.deleteById(user.getId());
     }
 
     public Page<UserDTO> getUserPage(Pageable pageable){
@@ -148,15 +142,10 @@ public class UserService {
 
     }
 
-    /*
-        A custom method that maps Page<User> userPage to Page<UserDTO> userDTOPage
-        @param userPage page of Users
-        @return page of userDTOs
-     */
     private Page<UserDTO> getUserDTOPage(Page<User> userPage){
        // Page<UserDTO> userDTOPage=userPage.map(userMapper::userToUserDTO);
 
-        //We are writing a custom functional interface and we are overriding apply method here.
+        //Özel bir functional interface yazıp apply metodunu oberride ediyoruz
         Page<UserDTO> userDTOPage=userPage.map(new Function<User, UserDTO>() {
             @Override
             public UserDTO apply(User user) {
@@ -168,23 +157,19 @@ public class UserService {
     }
 
 
-    //this is updating just current user
-    // @Transactional is used to just allow one user to update the same user at the same time
+    //Bu metot sadece sistemde o an bulunan current userı günceller
+    // @Transactional sadece bir kullanıcının aynı kullanıcı güncellemesine izin verir.
+    //Mesela aynı anda admin ve customer aynı customerı güncelleyemez
     @Transactional
     public void updateUser(UserUpdateRequest userUpdateRequest){
         User user=getCurrentUser();
 
-        // TODO please move this code part and create a private custom method and call this method here
-      /*
-       if(user.getBuiltIn()){
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-       */
+        //Kullanıcının builtIn özelliği true ise değişikliğe izin vemiyor
        checkUserBuiltIn(user);
 
        boolean emailExist=userRepository.existsByEmail(userUpdateRequest.getEmail());
 
-       //no duplication
+       //Current user'ın emaili güncellenmek istenen yeni email ile aynı olmamalı
        if(emailExist && !userUpdateRequest.getEmail().equals(user.getEmail())){
            throw new ConflictException(String.format(ErrorMessage.EMAIL_ALREADY_EXISTS_MESSAGE,userUpdateRequest.getEmail()));
        }
@@ -245,7 +230,7 @@ public class UserService {
         userRepository.save(user);
     }
     private Set<Role> convertRoles(Set<String> pRoles){
-       //TODO we do not have any custom exception that handles the wrong type of role entry
+
         Set<Role> roles=new HashSet<>();
         if(pRoles==null){
             Role userRole=roleService.findByType(RoleType.ROLE_CUSTOMER);

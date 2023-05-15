@@ -27,12 +27,60 @@ public class ReportController {
         ByteArrayInputStream byteArrayInputStream=reportService.getUserReport();
         InputStreamResource inputStreamResource=new InputStreamResource(byteArrayInputStream);
         return ResponseEntity.ok()
-                //file name will be in header
+                //file name  header'da yer alacak
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment;filename="+fileName).
-                //for excel document custom implementation
+                //excel için özel tanımlama
                         contentType(MediaType.parseMediaType("application/vmd.ms-excel")).
-                //file body is here
+                //file body de body'de yer alacak
+                        body(inputStreamResource);
+    }
+
+    @GetMapping("/download/cars")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource>getCarReport(){
+        String fileName="cars.xlsx";
+        ByteArrayInputStream byteArrayInputStream=reportService.getCarReport();
+        InputStreamResource inputStreamResource=new InputStreamResource(byteArrayInputStream);
+        return ResponseEntity.ok()
+                //file name  header'da yer alacak
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment;filename="+fileName).
+                //excel için özel tanımlama
+                        contentType(MediaType.parseMediaType("application/vmd.ms-excel")).
+                //file body de body'de yer alacak
+                        body(inputStreamResource);
+    }
+
+    @GetMapping("/download/reservations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource>getReservationReport(){
+        String fileName="reservations.xlsx";
+        ByteArrayInputStream byteArrayInputStream=reportService.getReservationReport();
+        InputStreamResource inputStreamResource=new InputStreamResource(byteArrayInputStream);
+        return ResponseEntity.ok()
+                //file name  header'da yer alacak
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment;filename="+fileName).
+                //excel için özel tanımlama
+                        contentType(MediaType.parseMediaType("application/vmd.ms-excel")).
+                //file body de body'de yer alacak
+                        body(inputStreamResource);
+    }
+
+    @GetMapping("/download/payments")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource>getPaymentReport(){
+        String fileName="payments.xlsx";
+        ByteArrayInputStream byteArrayInputStream=reportService.getPaymentReport();
+        InputStreamResource inputStreamResource=new InputStreamResource(byteArrayInputStream);
+        return ResponseEntity.ok()
+                //file name  header'da yer alacak
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment;filename="+fileName).
+                //excel için özel tanımlama
+                        contentType(MediaType.parseMediaType("application/vmd.ms-excel")).
+                //file body de body'de yer alacak
                         body(inputStreamResource);
     }
 }

@@ -22,11 +22,11 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Configuration class for spring security
+ * Spring Secrurity konfigürasyon sınıfı
  */
 @Configuration
 /**
- * we are enabling the security here
+ * güvenliği aktif ettik
  */
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
@@ -39,19 +39,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         /**
-         * from any ip, we can enable to reach endpoints
+         * herhangi bir IP den endpointelere erişelebilsin
          */
         http.csrf().disable()
-                //TODO check-> https://www.baeldung.com/spring-security-session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                // let all Http request types work
+                // tüm HTTP sorgularında çalış
                 .and().authorizeRequests().antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .and().authorizeRequests().antMatchers("/register",
                         "/login","/files/download/**","files/display/**",
                         "contactmessege/visitors","/car/visitors/**",
                         "actuator/healt").permitAll()
                 .anyRequest().authenticated();
-        //we are adding our filer to spring security
+        //filterı spring security'e ekliyoruz
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -63,8 +62,8 @@ public class SecurityConfig {
     }
 
     /**
-     * we are allowing all headers, origins and methods here.
-     * @return WebMvcConfigurer
+     * burada tüm headers, origins ve method lara izin veriyoruz
+     WebMvcConfigurer
      */
     @Bean
     public WebMvcConfigurer corsConfigurer(){

@@ -55,11 +55,8 @@ public class Car {
 
     /*
     orphanRemoval
-        (optional) whether to apply the remove
-        operation to entities that have
-        been removed from the relationship
-        and cascade the remove operation
-        to those entities
+       eğer bir image silmeye çalışırsak onun bağlı olduğu bir car olacak ve hibernate silmeye izin vermeyecek.
+       Ama orphanRemoval ile bir entity'i bağlı olduğu entitylerle birlikte silebiliriz.
      */
     @OneToMany(orphanRemoval = true)
     @JoinColumn(name="car_id")

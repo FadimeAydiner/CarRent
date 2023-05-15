@@ -18,30 +18,24 @@ import java.util.List;
 @AllArgsConstructor
 public class ContactMessageService {
 
-    /**
-     * this is a constructor injection example
-     */
+   //constructor injection
     private ContactMessageRepository contactMessageRepository;
 
     private ContactMessageMapper contactMessageMapper;
+
     public void saveMessage(ContactMessageRequest contactMessageRequest){
         ContactMessage contactMessage = contactMessageMapper.contactMessageRequestToContactMessage(contactMessageRequest);
-
         contactMessageRepository.save(contactMessage);
     }
 
     public List<ContactMessageDTO>getAll(){
         List<ContactMessage> contactMessageList=contactMessageRepository.findAll();
         List<ContactMessageDTO>contactMessageDTOList = contactMessageMapper.map(contactMessageList);
-
-
         return contactMessageDTOList;
     }
 
-    //Program to interface not to implementation
-    //https://medium.com/javarevisited/oop-good-practices-coding-to-the-interface-baea84fd60d3
-    public ContactMessageDTO getContactMessage(Long id){
 
+    public ContactMessageDTO getContactMessage(Long id){
         ContactMessage contactMessage= contactMessageRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_MESSAGE,id)));
         ContactMessageDTO contactMessageDTO=contactMessageMapper.contactMessageToDTO(contactMessage);
@@ -49,7 +43,7 @@ public class ContactMessageService {
     }
 
     public void deleteContactMessage(Long id){
-        //first of all we need to find contactMessage by id information
+
         ContactMessageDTO contactMessageDTO = getContactMessage(id);
         ContactMessage contactMessage=contactMessageMapper.contactMessageDTOtoContactMessage(contactMessageDTO);
         contactMessageRepository.delete(contactMessage);

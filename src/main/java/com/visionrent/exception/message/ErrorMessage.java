@@ -31,6 +31,10 @@ public abstract class ErrorMessage {
 
     public static final String IMAGE_USED_MESSAGE="ImageFile is used by other car";
 
+    public static final String IMAGE_NOT_SAVED_MESSAGE="ImageFile can not save. You can try again";
+
+    public static final String IMAGE_NOT_DELETED_MESSAGE="ImageFile can not delete.It is used by a car";
+
 
 
     //Reservation
@@ -46,7 +50,11 @@ public abstract class ErrorMessage {
 
     public static final String CAR_USED_BY_RESERVATION_MESSAGE="Car can not be deleted. Car is used by a reservation";
 
+    //Payment
+    public static final String EXPIRATION_TIME_INCORRECT_MESSAGE="Expiration time is not correct";
+    public static final String PAYMENT_ALREADY_DONE_MESSAGE="Payment is already done with reservation id %d";
 
 
+    //Excel Report
     public static final String EXCEL_REPORT_ERROR_MESSAGE="Error occurred while generating excel report";
 }

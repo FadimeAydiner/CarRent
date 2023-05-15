@@ -15,12 +15,19 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface CarMapper {
 
+    List<CarDTO> map(List<Car> cars);
+
+    //Map işlemi sırasında targetta belirtilen değişkeni yoksayıyoruz.
+    //Çünkü carDTO'da olan image Car sınıfında  @OneToMany ilişkisi ile ImageFile tablosuna kaydediliyor.
+    //Dolayısıyla Car tablosunda image kaydedilecek alan olmadığından CarDTo'dan gelen image'i ignore yani görmezden geliyoruz.
+    //Diğer alanları map ediyoruz.
     @Mapping(target = "image",ignore = true)
     Car carDTOToCar(CarDTO carDTO);
 
 
-    List<CarDTO> map(List<Car> cars);
-
+    //Yukarıdaki işlemin tersini yapıyoruz. Car nesnesini CarDTO'a çevireceğiz.Ancak Car'da image yokkan CarDTO da var.
+    //@Named verilen qualifiedByName ile tetiklenir. Bir method ya da bean'e map yapacağımız zaman kullanılır.
+    //qualifiedByName ile çalışan getImageIds()'den image bilgisi alınır CarDTO'ya iletilir.
     @Mapping(source = "image",target="image",qualifiedByName = "getImageAsString")
     CarDTO carToCarDTO(Car car);
 

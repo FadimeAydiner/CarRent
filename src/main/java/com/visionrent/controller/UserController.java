@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-/*
-    All endpoints for user management except login and register
- */
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -35,7 +33,7 @@ public class UserController {
 
 
     //http://localhost:8084/user/auth/all
-    //authorization implemented here
+    //authorization işlemi gerekiyor bu metodu kullanmak için
     @PreAuthorize("(hasRole('ADMIN'))")
     @GetMapping("/auth/all")
     public ResponseEntity<List<UserDTO>> getAllUsers(){
@@ -44,7 +42,7 @@ public class UserController {
     }
 
     //http://localhost:8084/user
-    //getting current user information
+    //sisteme giriş yapan kullanıcı bilgileriniz alıyoruz
    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
     @GetMapping()
     public ResponseEntity<UserDTO> getUser(){
@@ -53,13 +51,15 @@ public class UserController {
     }
 
      //http://localhost:8084/user/1/auth
-    //Admin create a request to get a user with id
+    //Id bilgisi girilen kullanıcının bilgilerini getiriyoruz
      @PreAuthorize("(hasRole('ADMIN'))")
     @GetMapping("{id}/auth")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
         UserDTO userDTO=userService.getUserById(id);
         return ResponseEntity.ok(userDTO);
     }
+
+    //Id bilgisi ile kullanıcı silme
     @PreAuthorize("(hasRole('ADMIN'))")
     @DeleteMapping("/{id}/auth")
     public ResponseEntity<VRResponse> deleteUser(@PathVariable Long id){
@@ -70,6 +70,8 @@ public class UserController {
         response.setSuccess(true);
         return ResponseEntity.ok(response);
     }
+
+
 
     @PreAuthorize("(hasRole('ADMIN'))")
     //http://localhost:8084/user/auth/pages?page=0&size=3&sort=id&direction=DESC

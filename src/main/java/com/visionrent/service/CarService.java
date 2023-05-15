@@ -34,9 +34,9 @@ public class CarService {
     public void saveCar(String imageId, CarDTO carDTO){
 
         ImageFile imageFile=imageFileService.getImageById(imageId);
-        Integer usedCarCount=carRepository.findCarCountByImageId(imageFile.getId());
 
-        //TODO you can also use EXIST keyword in sql query
+        //Bu resmi kullanan araba var mı
+        Integer usedCarCount=carRepository.findCarCountByImageId(imageFile.getId());
 
         if(usedCarCount>0){
             throw new ConflictException(ErrorMessage.IMAGE_USED_MESSAGE);
@@ -106,7 +106,7 @@ public class CarService {
         if(car.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
-        //TODO new implementation is needed after reservation part
+
 
         boolean exist=reservationService.existByCar(car);
         if(exist){

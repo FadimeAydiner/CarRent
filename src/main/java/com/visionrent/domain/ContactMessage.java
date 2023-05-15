@@ -14,8 +14,7 @@ import javax.persistence.*;
 @Table(name = "t_cmessage")
 public class ContactMessage {
 
-    // TODO please read and learn strategy types
-    //! https://www.baeldung.com/hibernate-identifiers
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

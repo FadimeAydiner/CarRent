@@ -3,10 +3,14 @@ package com.visionrent.service;
 import com.visionrent.domain.ImageData;
 import com.visionrent.domain.ImageFile;
 import com.visionrent.dto.ImageFileDTO;
+import com.visionrent.exception.BadRequestException;
+import com.visionrent.exception.ConflictException;
 import com.visionrent.exception.ResourceNotFoundException;
 import com.visionrent.exception.message.ErrorMessage;
+import com.visionrent.repository.CarRepository;
 import com.visionrent.repository.ImageFileRepository;
-import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,13 +24,16 @@ import java.util.stream.Collectors;
 @Service
 
 public class ImageFileService {
+    @Autowired
+    private final CarRepository carRepository;
 
     private final ImageFileRepository imageFileRepository;
 
     /*
-        a type of constructor injection
+        constructor injection
      */
-    public ImageFileService(ImageFileRepository imageFileRepository) {
+    public ImageFileService(CarRepository carRepository, ImageFileRepository imageFileRepository) {
+        this.carRepository=carRepository;
         this.imageFileRepository = imageFileRepository;
     }
 
@@ -40,8 +47,8 @@ public class ImageFileService {
             ImageData imageData=new ImageData(file.getBytes());
             imageFile= new ImageFile(fileName,file.getContentType(),imageData);
         } catch (IOException e) {
-            //todo:we need a custom exception and message here
-            throw new RuntimeException(e);
+
+            throw new ConflictException(ErrorMessage.IMAGE_NOT_SAVED_MESSAGE);
         }
 
         imageFileRepository.save(imageFile);
@@ -69,6 +76,10 @@ public class ImageFileService {
 
     public void removeById(String id){
         ImageFile imageFile=getImageById(id);
+
+        if(carRepository.findCarCountByImageId(imageFile.getId())>0)
+            throw new BadRequestException(ErrorMessage.IMAGE_NOT_DELETED_MESSAGE);
+
         imageFileRepository.delete(imageFile);
     }
 

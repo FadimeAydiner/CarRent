@@ -31,19 +31,19 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String jwtToken=parseJWT(request);
-        //validate our token in every request
+        //her request için tokenın geçerliliğini kontrol eder.
         try {
             if(jwtToken!=null && jwtUtils.validateJwtToken(jwtToken)){
-                //get email from this token
+                //token dan email i alır
                 String email=jwtUtils.getEmailFromToken(jwtToken);
 
-                //KEY PART THAT CALLS USER DETAILS FROM SECURITY SERVICE LAYER
+                //SECURITY SERVICE LAYER'dan UserDetails'i alıyoruz
                 UserDetails userDetails=userDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authenticationToken=
                         new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
 
-                //we are sending all userDetails information to the securityContext
+                //userDetails'ı securityContex'e gönderiyoruz
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             }

@@ -33,34 +33,28 @@ public class ContactMessageController {
 
 
     private ContactMessageService contactMessageService;
-    private final ContactMessageRepository contactMessageRepository;
+  //  private final ContactMessageRepository contactMessageRepository;
 
 
     @PostMapping("/visitors")
     public ResponseEntity<VRResponse> createMessage(@Valid @RequestBody ContactMessageRequest contactMessageRequest){
-        /*
-         * Design PROBLEM -> this kind of service layer implementations should be done in service layer.
-         */
+
        contactMessageService.saveMessage(contactMessageRequest);
-        // as an example of HARD CODING
+
         //VRResponse response = new VRResponse("you made it",true);
         VRResponse response = new VRResponse(ResponseMessage.CONTACT_MESSAGE_SAVE_RESPONSE,true);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //TODO please read about SQL-INJECTION
-
-    //TODO IMPORTANT -> admin endpoint
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<ContactMessageDTO>>getAllContactMessage(){
         List<ContactMessageDTO>contactMessageDTOList = contactMessageService.getAll();
         return ResponseEntity.ok(contactMessageDTOList);
-        //bad implementation of code in context of readability.
-        //return ResponseEntity.ok(contactMessageMapper.map(contactMessageService.getAll()));
+
     }
 
-    //TODO IMPORTANT -> admin endpoint
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<VRResponse> deleteContactMessage(@PathVariable Long id){
@@ -120,10 +114,6 @@ public class ContactMessageController {
         return ResponseEntity.ok(contactMessageDTOS);
     }
 
-    /*
-        this implementation should exist in Service Layer
-        Controller Layer is not suitable for this implementation
-     */
 
 
 }
