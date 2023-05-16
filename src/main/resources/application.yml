@@ -12,9 +12,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/carRent
-    username: mvc_user
-    password: mvc_password
+    url: jdbc:postgresql://localhost:5432/carrent_management
+    username: postgres
+    password: changeme
     driver-class-name: org.postgresql.Driver
 
 
